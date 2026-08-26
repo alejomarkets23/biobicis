@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biobicis — Inventario 26/08/2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#04162E; --navy-dark:#020D1C; --teal:#01A0A6; --teal-dark:#017377;
+  --lime:#B9FF00; --green:#1E8E3E; --yellow:#F4B400; --red:#D93025; --slate:#5B6B85;
+  --bg:#F4F6F8; --card:#FFFFFF; --border:#E3E7EC; --text:#04162E; --text-mute:#5F6B7A;
+  --heading:#04162E;
+  color-scheme: light;
+}
+html[data-theme="dark"]{
+  --bg:#0B1220; --card:#121B2E; --border:#22304A; --text:#DCE4F0; --text-mute:#93A3BE;
+  --heading:#EAF1F7; --navy-dark:#010A14; --slate:#8695B3;
+  color-scheme: dark;
+}
+html{transition:background-color .2s ease;}
+body{transition:background-color .2s ease, color .2s ease;}
+.panel, .kpi, .filters{transition:background-color .2s ease, border-color .2s ease;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);}
+header.top{background:linear-gradient(90deg,var(--navy),var(--navy-dark));color:#fff;padding:22px 28px;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-icon{width:46px;height:46px;flex-shrink:0;}
+.wordmark{font-family:'Pacifico',cursive;font-size:28px;font-weight:400;color:var(--teal);line-height:1;}
+.brand-caption{font-size:10.5px;letter-spacing:.25em;color:#CFE3E0;font-weight:600;margin-top:2px;}
+.subtitle{font-size:13px;color:#B9C2D6;margin-top:6px;}
+.corte-badge{display:inline-block;margin-top:10px;background:#ffffff1a;border:1px solid #ffffff33;
+  padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;}
+.accent-bar{height:5px;background:linear-gradient(90deg,var(--teal),var(--lime));}
+.filters{background:#fff;border-bottom:1px solid var(--border);padding:12px 28px;display:flex;gap:12px;
+  flex-wrap:wrap;align-items:center;position:sticky;top:0;z-index:10;}
+.filters label{font-size:11px;color:var(--text-mute);font-weight:700;margin-right:4px;}
+.filters input, .filters select{padding:7px 10px;border:1px solid var(--border);border-radius:6px;
+  font-size:12px;color:var(--text);background:#fff;min-width:150px;}
+.filters .fbtn{background:transparent;border:1px solid var(--border);color:var(--navy);padding:7px 14px;
+  border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;}
+.filters .fcount{font-size:11.5px;color:var(--text-mute);margin-left:auto;}
+main{max-width:1300px;margin:0 auto;padding:22px 24px 50px;}
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+@media(max-width:900px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){.kpi-row{grid-template-columns:1fr;}}
+.kpi{background:var(--card);border:1px solid var(--border);border-top:4px solid var(--teal);
+  border-radius:10px;padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+.kpi .label{font-size:11px;color:var(--text-mute);font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+.kpi .value{font-size:24px;font-weight:800;color:var(--heading);margin-top:6px;}
+.kpi .sub{font-size:11px;color:var(--text-mute);margin-top:4px;}
+.kpi.c2{border-top-color:var(--yellow);} .kpi.c3{border-top-color:var(--navy);}
+.kpi.c4{border-top-color:var(--lime);} .kpi.c5{border-top-color:var(--teal-dark);} .kpi.c6{border-top-color:var(--slate);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+@media(max-width:900px){.grid2{grid-template-columns:1fr;}}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px;}
+.panel h2{margin:0 0 4px;font-size:15px;color:var(--heading);}
+.panel .panel-sub{font-size:11px;color:var(--text-mute);margin-bottom:12px;}
+.chart-wrap{position:relative;height:230px;}
+.linea-group{margin-bottom:14px;}
+.linea-title{font-size:12.5px;font-weight:700;color:var(--teal-dark);text-transform:uppercase;
+  letter-spacing:.03em;border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:8px;}
+.linea-sub{color:var(--text-mute);font-weight:400;text-transform:none;}
+.modelo-row{margin-bottom:8px;}
+.modelo-name{font-size:13px;font-weight:700;color:var(--heading);margin-bottom:4px;}
+.modelo-total{font-weight:400;color:var(--text-mute);font-size:11px;}
+.color-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{font-size:11px;font-weight:600;padding:3px 9px;border-radius:12px;}
+.chip-pend{background:#FEF7E0;color:#B06000;}
+.empty-note{color:var(--text-mute);font-size:12px;padding:10px 0;}
+table.data{width:100%;border-collapse:collapse;font-size:12.5px;}
+table.data th{text-align:left;padding:8px 10px;background:#F8F9FB;color:var(--text-mute);font-size:10.5px;
+  text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
+table.data th:hover{color:var(--navy);}
+table.data td{padding:7px 10px;border-bottom:1px solid #F0F2F5;}
+table.data tr:hover td{background:#FAFBFC;}
+.pill{padding:2px 8px;border-radius:9px;font-size:10.5px;font-weight:700;}
+footer{text-align:center;background:var(--navy);color:#B9C2D6;padding:20px;font-size:11.5px;margin-top:20px;}
+footer strong{color:#fff;}
+::-webkit-scrollbar{height:8px;width:8px;} ::-webkit-scrollbar-thumb{background:#D3D9E0;border-radius:4px;}
+.info-banner{
+  background:#FEF7E0; border:1px solid #F4E1A0; color:#8a6100; border-radius:8px;
+  padding:10px 14px; font-size:12.5px; margin-bottom:18px; display:flex; gap:8px; align-items:flex-start;
+}
+html[data-theme="dark"] .info-banner{background:#2A2410; border-color:#5c4d13; color:#F4D77A;}
+.info-banner strong{font-weight:700;}
+
+
+.theme-toggle{
+  position:fixed; right:20px; bottom:20px; z-index:999;
+  width:48px; height:48px; border-radius:50%;
+  background:rgba(4,22,46,0.35); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,0.25);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.15);
+  transition:background-color .2s ease, transform .15s ease;
+}
+.theme-toggle:hover{background:rgba(4,22,46,0.5); transform:scale(1.06);}
+html[data-theme="dark"] .theme-toggle{background:rgba(234,241,247,0.15); border-color:rgba(255,255,255,0.18);}
+html[data-theme="dark"] .theme-toggle:hover{background:rgba(234,241,247,0.25);}
+.theme-toggle svg{width:22px; height:22px;}
+
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg class="brand-icon" viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="#01A0A6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="54" cy="64" r="33" stroke-width="8.5"/>
+        <circle cx="146" cy="64" r="33" stroke-width="8.5"/>
+        <path d="M 76 42 C 92 42 100 46 108 54 C 116 62 124 66 140 66" stroke-width="8.5"/>
+        <path d="M 120 42 C 104 42 96 46 88 54 C 80 62 72 66 60 66" stroke-width="8.5"/>
+        <path d="M 120 42 L 130 20 L 148 20" stroke-width="8.5"/>
+        <path d="M 76 42 L 64 18" stroke-width="8.5"/>
+        <path d="M 57 18 L 71 18" stroke-width="8.5"/>
+      </g>
+      <g fill="#01A0A6">
+        <rect x="90" y="53" width="5.5" height="9" rx="1.2" transform="rotate(48 92.75 57.5)"/>
+        <rect x="98" y="53" width="5.5" height="9" rx="1.2" transform="rotate(48 100.75 57.5)"/>
+        <rect x="106" y="53" width="5.5" height="9" rx="1.2" transform="rotate(48 108.75 57.5)"/>
+      </g>
+    </svg>
+    <div>
+      <div class="wordmark">Biobicis</div>
+      <div class="brand-caption">COLOMBIA</div>
+    </div>
+  </div>
+  <div class="subtitle">Inventario Comercial · Motos y Bicicletas Eléctricas</div>
+  <div class="corte-badge">Corte: 26/08/2026</div>
+</header>
+<div class="accent-bar"></div>
+
+<div class="filters">
+  <div><label>Modelo</label><input list="modelosList" id="fModelo" placeholder="Buscar modelo…"></div>
+  <datalist id="modelosList"></datalist>
+  <div><label>Bodega</label><select id="fBodega"><option value="">Todas</option></select></div>
+  <div><label>Línea</label><select id="fLinea"><option value="">Todas</option></select></div>
+  <button class="fbtn" id="clearFilters">Limpiar filtros</button>
+  <span class="fcount" id="filterCount"></span>
+</div>
+
+<main>
+  <div class="info-banner">
+    <span>ℹ️</span>
+    <span><strong>Nota de bodegas:</strong> en Centenario el 100% de las unidades está pendiente de ensamblaje (no disponible para venta aún). En Ricaurte, solo el bloque "Por Armar" está pendiente — el resto ya está ensamblado y disponible.</span>
+  </div>
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>Unidades por Línea</h2>
+      <div class="panel-sub" id="lineaSub"></div>
+      <div class="chart-wrap"><canvas id="chartLinea"></canvas></div>
+    </div>
+    <div class="panel">
+      <h2>Distribución por Bodega</h2>
+      <div class="panel-sub" id="sedeSub">Unidades totales</div>
+      <div class="chart-wrap"><canvas id="chartSede"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>Bodega Centenario</h2>
+      <div class="panel-sub" id="centenarioSub"></div>
+      <div id="centenarioList"></div>
+    </div>
+    <div class="panel">
+      <h2>Bodega Ricaurte</h2>
+      <div class="panel-sub" id="ricaurteSub"></div>
+      <div id="ricaurteList"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Pendientes por Ensamblar</h2>
+    <div class="panel-sub">Unidades en proceso — no disponibles para venta</div>
+    <div id="pendList"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Detalle Completo <span class="panel-sub" id="tableCount" style="display:inline;"></span></h2>
+    <div style="overflow-x:auto;max-height:420px;overflow-y:auto;">
+      <table class="data" id="dataTable">
+        <thead><tr>
+          <th data-k="modelo">Modelo</th><th data-k="linea">Línea</th><th data-k="color">Color</th>
+          <th data-k="sede">Bodega</th><th data-k="estado">Estado</th><th data-k="stock">Stock</th>
+        </tr></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<footer>
+  Elaborado: <strong>26/08/2026</strong> · Corte de inventario: <strong>26/08/2026</strong><br>
+  Biobicis · Reporte generado automáticamente desde el archivo de inventario
+</footer>
+
+<button class="theme-toggle" id="themeToggle" title="Cambiar modo claro/oscuro" aria-label="Cambiar modo claro/oscuro">
+  <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="#F4B400" stroke-width="2" stroke-linecap="round" style="display:none;">
+    <circle cx="12" cy="12" r="4.5"/>
+    <path d="M12 2.5v2.5M12 19v2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2.5 12H5M19 12h2.5M4.2 19.8L6 18M18 6l1.8-1.8"/>
+  </svg>
+  <svg id="themeIconMoon" viewBox="0 0 24 24" fill="#DCE4F0" stroke="none">
+    <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/>
+  </svg>
+</button>
+
+<script>
+const RECORDS = [{"sede":"CENTENARIO","modelo":"RINO 26","color":"NEGRO","stock":18,"linea":"26","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"RINO 26","color":"ROJO","stock":33,"linea":"26","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"TUCAN 25","color":"AZUL","stock":17,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"TUCAN 25","color":"GRIS","stock":19,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"TUCAN 25","color":"NEGRO","stock":20,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"TUCAN 25","color":"PLATA","stock":15,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"CORAL 25","color":"AMARILLO","stock":7,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"ORIX 25","color":"GRIS","stock":1,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"ORIX 25","color":"ROJO","stock":10,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"ORIX 25","color":"NEGRO","stock":3,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"BENGALA 25","color":"ROJO","stock":37,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"BENGALA 25","color":"NEGRO","stock":49,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"BENGALA 25","color":"AZUL","stock":26,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"BENGALA 25","color":"PLATA","stock":15,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"BENGALA 25","color":"AZUL MATE","stock":33,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"PINGUI 26","color":"AZUL","stock":20,"linea":"26","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"PINGUI 26","color":"VERDE","stock":6,"linea":"26","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"JAGUAR 25","color":"BLANCO","stock":17,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"JAGUAR 25","color":"NEGRO","stock":16,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"JAGUAR 25","color":"ROJO","stock":12,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"IG KOMODO","color":"NEGRO","stock":16,"linea":"SL","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"IG KOMODO","color":"ROJO","stock":14,"linea":"SL","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"IG KOMODO","color":"PLATA","stock":19,"linea":"SL","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"IG KOMODO","color":"AZUL","stock":25,"linea":"SL","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"MANTIS","color":"AZUL","stock":1,"linea":"SL","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"JAGUAR 19","color":"AZUL","stock":2,"linea":"19","pendiente":true,"estado":"Pendiente"},{"sede":"CENTENARIO","modelo":"JAGUAR 19","color":"ROJO","stock":2,"linea":"19","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"TUCAN 25","color":"AZUL","stock":2,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"TUCAN 25","color":"GRIS","stock":1,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"TUCAN 25","color":"NEGRO","stock":1,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"RINO 26","color":"NEGRO","stock":6,"linea":"26","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"RINO 26","color":"ROJO","stock":7,"linea":"26","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"CORAL 25","color":"AZUL","stock":3,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"CORAL 25","color":"AMARILLO","stock":2,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"CORAL 25","color":"GRIS","stock":2,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"CORAL 25","color":"NEGRO","stock":1,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"BENGALA 25","color":"PLATA","stock":4,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"BENGALA 25","color":"AZUL","stock":22,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"BENGALA 25","color":"NEGRO","stock":1,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"BENGALA 25","color":"ROJO","stock":2,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"PINGUI 26","color":"AZUL","stock":2,"linea":"26","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"PINGUI 26","color":"ROJO","stock":3,"linea":"26","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"ORIX 25","color":"ROJO","stock":1,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"JAGUAR 25","color":"BLANCO","stock":2,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"JAGUAR 25","color":"NEGRO","stock":2,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"JAGUAR 25","color":"ROJO","stock":2,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"IG KOMODO","color":"NEGRO","stock":1,"linea":"SL","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"IG KOMODO","color":"ROJO","stock":3,"linea":"SL","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"IG KOMODO","color":"PLATA","stock":2,"linea":"SL","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"IG KOMODO","color":"AZUL","stock":1,"linea":"SL","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"MANTIS 19","color":"ROJO","stock":3,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"MANTIS 19","color":"AZUL","stock":1,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"HALCON 19","color":"ROJO","stock":3,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"HALCON 19","color":"AMARILLO","stock":2,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"PANTERA 19","color":"NEGRO","stock":3,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"PANDA 19","color":"ROJO","stock":1,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"PANDA 19","color":"AZUL","stock":1,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"JAGUAR 19","color":"ROJO","stock":2,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"JAGUAR 19","color":"AZUL","stock":2,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"LOBO 25","color":"VERDE","stock":1,"linea":"25","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"LINCE 19","color":"AZUL","stock":1,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"TITI","color":"GRIS","stock":2,"linea":"SL","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"PINGUI 19","color":"ROJO","stock":5,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"PINGUI 19","color":"AZUL","stock":1,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"PINGUI 19","color":"NEGRO","stock":1,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"PINGUI 19","color":"AZUL OSCURO","stock":2,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"BENGALA 19","color":"NEGRO","stock":2,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"BENGALA 19","color":"ROJO","stock":1,"linea":"19","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"RANA","color":"NEGRO","stock":2,"linea":"SL","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"RANA","color":"GRIS","stock":2,"linea":"SL","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"RANA","color":"AZUL","stock":1,"linea":"SL","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"RANA","color":"AMARILLO","stock":1,"linea":"SL","pendiente":false,"estado":"Disponible"},{"sede":"RICAURTE","modelo":"PINGUI 26","color":"AZUL","stock":4,"linea":"26","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"PINGUI 26","color":"NEGRO","stock":3,"linea":"26","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"PINGUI 26","color":"ROJO","stock":3,"linea":"26","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"PINGUI 26","color":"VERDE","stock":2,"linea":"26","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"BENGALA 25","color":"ROJO","stock":1,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"BENGALA 25","color":"NEGRO","stock":3,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"BENGALA 25","color":"AZUL","stock":2,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"CORAL 25","color":"AMARILLO","stock":1,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"ORIX 25","color":"NEGRO","stock":2,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"ORIX 25","color":"ROJO","stock":4,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"IG KOMODO","color":"ROJO","stock":29,"linea":"SL","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"IG KOMODO","color":"NEGRO","stock":22,"linea":"SL","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"IG KOMODO","color":"AZUL","stock":5,"linea":"SL","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"IG KOMODO","color":"PLATA","stock":10,"linea":"SL","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"JAGUAR 25","color":"ROJO","stock":1,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"JAGUAR 25","color":"NEGRO","stock":1,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"JAGUAR 25","color":"BLANCO","stock":1,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"TUCAN 25","color":"NEGRO","stock":1,"linea":"25","pendiente":true,"estado":"Pendiente"},{"sede":"RICAURTE","modelo":"TUCAN 25","color":"GRIS","stock":1,"linea":"25","pendiente":true,"estado":"Pendiente"}];
+const LINEA_LABELS = {"26": "Línea 2026", "25": "Línea 2025", "19": "Línea 2019", "SL": "Sin línea / Otros"};
+
+const LINEA_ORDER = ["26","25","19","SL"];
+let charts = {};
+let sortState = {key:"stock", dir:-1};
+
+function semaforo(stock){
+  if(stock>=15) return ["#1E8E3E","#E6F4EA"];
+  if(stock>=5) return ["#B06000","#FEF7E0"];
+  if(stock>=1) return ["#D93025","#FCE8E6"];
+  return ["#5F6B7A","#E3E7EC"];
+}
+function destroyChart(k){ if(charts[k]){charts[k].destroy(); delete charts[k];} }
+function isDarkMode(){ return document.documentElement.getAttribute("data-theme") === "dark"; }
+
+function uniqueVals(arr, f){ return [...new Set(arr.map(r=>r[f]).filter(Boolean))].sort(); }
+function populateFilters(){
+  document.getElementById("modelosList").innerHTML = uniqueVals(RECORDS,"modelo").map(m=>'<option value="'+m+'">').join("");
+  const bodegaSel = document.getElementById("fBodega");
+  uniqueVals(RECORDS,"sede").forEach(function(s){
+    const o=document.createElement("option"); o.value=s; o.textContent=s[0]+s.slice(1).toLowerCase(); bodegaSel.appendChild(o);
+  });
+  const lineaSel = document.getElementById("fLinea");
+  LINEA_ORDER.filter(function(l){ return RECORDS.some(function(r){ return r.linea===l; }); }).forEach(function(l){
+    const o=document.createElement("option"); o.value=l; o.textContent=LINEA_LABELS[l]; lineaSel.appendChild(o);
+  });
+}
+
+["fModelo","fBodega","fLinea"].forEach(function(id){
+  document.getElementById(id).addEventListener("input", render);
+  document.getElementById(id).addEventListener("change", render);
+});
+document.getElementById("clearFilters").addEventListener("click", function(){
+  document.getElementById("fModelo").value="";
+  document.getElementById("fBodega").value="";
+  document.getElementById("fLinea").value="";
+  render();
+});
+document.querySelectorAll("#dataTable th").forEach(function(th){
+  th.addEventListener("click", function(){
+    const k = th.dataset.k;
+    if(sortState.key===k) sortState.dir *= -1; else { sortState.key=k; sortState.dir=1; }
+    render();
+  });
+});
+
+function getFiltered(){
+  const m = document.getElementById("fModelo").value.trim().toUpperCase();
+  const b = document.getElementById("fBodega").value;
+  const l = document.getElementById("fLinea").value;
+  return RECORDS.filter(function(r){
+    return (!m || r.modelo.toUpperCase().indexOf(m)>=0) && (!b || r.sede===b) && (!l || r.linea===l);
+  });
+}
+
+function render(){
+  const F = getFiltered();
+  document.getElementById("filterCount").textContent = F.length + " de " + RECORDS.length + " líneas de stock";
+  const disp = F.filter(function(r){ return r.estado==="Disponible" && r.stock>0; });
+  const pend = F.filter(function(r){ return r.estado==="Pendiente" && r.stock>0; });
+  renderKPIs(disp, pend);
+  renderCharts(disp, pend);
+  renderBodega("CENTENARIO", disp, "centenarioList", "centenarioSub");
+  renderBodega("RICAURTE", disp, "ricaurteList", "ricaurteSub");
+  renderPendientes(pend);
+  renderTable(F);
+}
+
+function sum(arr, f){ return arr.reduce(function(s,r){ return s + f(r); }, 0); }
+
+function renderKPIs(disp, pend){
+  const totalDisp = sum(disp, function(r){ return r.stock; });
+  const totalPend = sum(pend, function(r){ return r.stock; });
+  const totalGeneral = totalDisp + totalPend;
+  const modelos = new Set(disp.map(function(r){ return r.modelo; }));
+  const porModelo = {};
+  disp.forEach(function(r){ porModelo[r.modelo] = (porModelo[r.modelo]||0) + r.stock; });
+  let topModelo = "-", topStock = 0;
+  Object.keys(porModelo).forEach(function(m){ if(porModelo[m] > topStock){ topStock = porModelo[m]; topModelo = m; } });
+  const pctPend = totalGeneral>0 ? (totalPend/totalGeneral*100) : 0;
+  const pctDisp = totalGeneral>0 ? (totalDisp/totalGeneral*100) : 0;
+  const bySede = {};
+  disp.forEach(function(r){ bySede[r.sede] = (bySede[r.sede]||0) + r.stock; });
+
+  const kpis = [
+    {label:"Unidades Disponibles", value: totalDisp.toLocaleString("es-CO"), sub: pctDisp.toFixed(0)+"% del inventario total", cls:"c1"},
+    {label:"Pendientes por Ensamblar", value: totalPend.toLocaleString("es-CO"), sub: pctPend.toFixed(0)+"% del inventario total", cls:"c2"},
+    {label:"Unidades Totales", value: totalGeneral.toLocaleString("es-CO"), sub:"Disponibles + pendientes por ensamblar", cls:"c3"},
+    {label:"Modelo con Mayor Stock", value: topModelo, sub: topStock + " unidades disponibles", cls:"c4"},
+    {label:"Modelos con Stock", value: modelos.size, sub:"Referencias distintas disponibles", cls:"c5"},
+    {label:"Centenario / Ricaurte", value: (bySede.CENTENARIO||0)+" / "+(bySede.RICAURTE||0), sub:"Unidades disponibles por bodega", cls:"c6"}
+  ];
+  document.getElementById("kpiRow").innerHTML = kpis.map(function(k){
+    return '<div class="kpi '+k.cls+'"><div class="label">'+k.label+'</div><div class="value">'+k.value+'</div><div class="sub">'+k.sub+'</div></div>';
+  }).join("");
+}
+
+function renderCharts(disp, pend){
+  const porLinea = {};
+  disp.forEach(function(r){ porLinea[r.linea] = (porLinea[r.linea]||0) + r.stock; });
+  const lineasPresentes = LINEA_ORDER.filter(function(l){ return porLinea[l]; });
+  document.getElementById("lineaSub").textContent = "Total " + sum(disp, function(r){ return r.stock; }) + " unidades";
+
+  destroyChart("linea");
+  charts.linea = new Chart(document.getElementById("chartLinea"), {
+    type:"bar",
+    data:{ labels: lineasPresentes.map(function(l){ return LINEA_LABELS[l]; }),
+      datasets:[{ data: lineasPresentes.map(function(l){ return porLinea[l]; }), backgroundColor:"#01A0A6", borderRadius:5 }]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true, ticks:{precision:0} } } }
+  });
+
+  const SEDE_ORDER = ["CENTENARIO","RICAURTE"];
+  const SEDE_COLORS = {
+    CENTENARIO: isDarkMode() ? "#2C7EED" : "#04162E",
+    RICAURTE: "#01A0A6"
+  };
+  const porSede = { CENTENARIO:0, RICAURTE:0 };
+  disp.forEach(function(r){ porSede[r.sede] = (porSede[r.sede]||0) + r.stock; });
+  pend.forEach(function(r){ porSede[r.sede] = (porSede[r.sede]||0) + r.stock; });
+  const sedesPresentes = SEDE_ORDER.filter(function(s){ return porSede[s] > 0; });
+  const totalSede = sum(sedesPresentes, function(s){ return porSede[s]; });
+  document.getElementById("sedeSub").textContent = "Total " + totalSede + " unidades (disponibles + pendientes)";
+  destroyChart("sede");
+  charts.sede = new Chart(document.getElementById("chartSede"), {
+    type:"doughnut",
+    data:{ labels: sedesPresentes.map(function(s){ return s[0]+s.slice(1).toLowerCase(); }),
+      datasets:[{ data: sedesPresentes.map(function(s){ return porSede[s]; }), backgroundColor: sedesPresentes.map(function(s){ return SEDE_COLORS[s]; }) }]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:"bottom", labels:{font:{size:11}}}} }
+  });
+}
+
+function renderBodega(sede, disp, elId, subId){
+  const items = disp.filter(function(r){ return r.sede===sede; });
+  const total = sum(items, function(r){ return r.stock; });
+  document.getElementById(subId).textContent = total + " unidades disponibles";
+  const grouped = {};
+  items.forEach(function(r){
+    grouped[r.linea] = grouped[r.linea] || {};
+    grouped[r.linea][r.modelo] = grouped[r.linea][r.modelo] || [];
+    grouped[r.linea][r.modelo].push(r);
+  });
+  let html = "";
+  LINEA_ORDER.forEach(function(linea){
+    if(!grouped[linea]) return;
+    const modelos = grouped[linea];
+    const allRows = [].concat.apply([], Object.values(modelos));
+    const subtotal = sum(allRows, function(r){ return r.stock; });
+    html += '<div class="linea-group"><div class="linea-title">'+LINEA_LABELS[linea]+' <span class="linea-sub">('+subtotal+' u.)</span></div>';
+    Object.keys(modelos).sort().forEach(function(modelo){
+      const rows = modelos[modelo].slice().sort(function(a,b){ return b.stock-a.stock; });
+      const modeloTotal = sum(rows, function(r){ return r.stock; });
+      html += '<div class="modelo-row"><div class="modelo-name">'+modelo+' <span class="modelo-total">'+modeloTotal+' u.</span></div><div class="color-chips">';
+      rows.forEach(function(r){
+        const sc = semaforo(r.stock);
+        html += '<span class="chip" style="color:'+sc[0]+';background:'+sc[1]+';">'+r.color+' · '+r.stock+'</span>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div>';
+  });
+  let emptyMsg = 'Sin resultados para este filtro.';
+  if(sede === "CENTENARIO"){
+    emptyMsg = 'Toda la bodega Centenario está actualmente pendiente de ensamblaje. Ver la sección "Pendientes por Ensamblar" más abajo.';
+  }
+  document.getElementById(elId).innerHTML = html || ('<div class="empty-note">' + emptyMsg + '</div>');
+}
+
+function renderPendientes(pend){
+  if(pend.length===0){
+    document.getElementById("pendList").innerHTML = '<div class="empty-note">No hay unidades pendientes de ensamblar con este filtro.</div>';
+    return;
+  }
+  const bySede = {};
+  pend.forEach(function(r){ bySede[r.sede] = bySede[r.sede] || []; bySede[r.sede].push(r); });
+  let html = "";
+  Object.keys(bySede).forEach(function(sede){
+    const rows = bySede[sede];
+    const subtotal = sum(rows, function(r){ return r.stock; });
+    html += '<div class="linea-group"><div class="linea-title">'+(sede[0]+sede.slice(1).toLowerCase())+' <span class="linea-sub">('+subtotal+' u. pendientes)</span></div>';
+    const byModelo = {};
+    rows.forEach(function(r){ byModelo[r.modelo] = byModelo[r.modelo] || []; byModelo[r.modelo].push(r); });
+    Object.keys(byModelo).sort().forEach(function(modelo){
+      const mrows = byModelo[modelo].slice().sort(function(a,b){ return b.stock-a.stock; });
+      const modeloTotal = sum(mrows, function(r){ return r.stock; });
+      html += '<div class="modelo-row"><div class="modelo-name">'+modelo+' <span class="modelo-total">'+modeloTotal+' u.</span></div><div class="color-chips">';
+      mrows.forEach(function(r){ html += '<span class="chip chip-pend">'+r.color+' · '+r.stock+'</span>'; });
+      html += '</div></div>';
+    });
+    html += '</div>';
+  });
+  document.getElementById("pendList").innerHTML = html;
+}
+
+function renderTable(F){
+  const rows = F.filter(function(r){ return r.stock>0; }).slice().sort(function(a,b){
+    const av=a[sortState.key], bv=b[sortState.key];
+    if(typeof av === "number") return (av-bv)*sortState.dir;
+    return String(av).localeCompare(String(bv)) * sortState.dir;
+  });
+  document.getElementById("tableCount").textContent = "(" + rows.length + " registros)";
+  document.getElementById("tableBody").innerHTML = rows.map(function(r){
+    const sc = semaforo(r.stock);
+    const ec = r.estado==="Disponible" ? ["#1E8E3E","#E6F4EA"] : ["#B06000","#FEF7E0"];
+    return '<tr><td>'+r.modelo+'</td><td>'+LINEA_LABELS[r.linea]+'</td><td>'+r.color+'</td>'+
+      '<td>'+(r.sede[0]+r.sede.slice(1).toLowerCase())+'</td>'+
+      '<td><span class="pill" style="color:'+ec[0]+';background:'+ec[1]+';">'+r.estado+'</span></td>'+
+      '<td><span class="pill" style="color:'+sc[0]+';background:'+sc[1]+';">'+r.stock+'</span></td></tr>';
+  }).join("");
+}
+
+populateFilters();
+// =========================================================
+// Toggle de modo claro/oscuro
+// =========================================================
+(function initTheme(){
+  const STORAGE_KEY = "biobicisTheme";
+  const root = document.documentElement;
+
+  function applyTheme(theme){
+    if(theme === "dark"){
+      root.setAttribute("data-theme", "dark");
+    } else {
+      root.removeAttribute("data-theme");
+    }
+  }
+
+  let saved = null;
+  try { saved = localStorage.getItem(STORAGE_KEY); } catch(e){}
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  applyTheme(saved || (prefersDark ? "dark" : "light"));
+})();
+
+render();
+
+(function bindThemeToggle(){
+  const STORAGE_KEY = "biobicisTheme";
+  const root = document.documentElement;
+  const btn = document.getElementById("themeToggle");
+  const sunIcon = document.getElementById("themeIconSun");
+  const moonIcon = document.getElementById("themeIconMoon");
+
+  function syncIcons(){
+    const isDark = root.getAttribute("data-theme") === "dark";
+    if(sunIcon) sunIcon.style.display = isDark ? "block" : "none";
+    if(moonIcon) moonIcon.style.display = isDark ? "none" : "block";
+  }
+  syncIcons();
+
+  if(btn){
+    btn.addEventListener("click", function(){
+      const isDark = root.getAttribute("data-theme") === "dark";
+      const next = isDark ? "light" : "dark";
+      if(next === "dark"){ root.setAttribute("data-theme", "dark"); } else { root.removeAttribute("data-theme"); }
+      try { localStorage.setItem(STORAGE_KEY, next); } catch(e){}
+      syncIcons();
+      render();
+    });
+  }
+})();
+
+</script>
+</body>
+</html>
