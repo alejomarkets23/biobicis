@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioBicis Colombia — Reporte Ejecutivo de Inventario (03/09/2026)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root {
+  --turquesa: #00ABB1;
+  --azul-profundo: #2C2C52;
+  --verde-energia: #00F352;
+  --onyx: #2D2D2D;
+  --bg: #F7F5F2;
+  --card: #FFFFFF;
+  --border: #E8E4DF;
+  --text: #2D2D2D;
+  --text-mute: #7A7570;
+  --heading: #2D2D2D;
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  --bg: #1A1A1A;
+  --card: #242424;
+  --border: #3A3A3A;
+  --text: #FFFFFF;
+  --text-mute: #A8A8A8;
+  --heading: #FFFFFF;
+  --onyx: #111111;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Jost', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  transition: background-color .2s ease, color .2s ease;
+}
+header.top {
+  background: linear-gradient(135deg, #1e1e3b 0%, #2C2C52 100%);
+  color: #fff;
+  padding: 22px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 16px; }
+.brand-logo {
+  height: 64px; width: auto;
+  border-radius: 8px; object-fit: contain;
+  background: #fff; padding: 6px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.brand-sep { width: 1px; height: 50px; background: rgba(255,255,255,0.25); }
+.wordmark {
+  font-family: 'Pacifico', cursive;
+  font-size: 28px;
+  color: var(--turquesa);
+  line-height: 1;
+}
+.brand-caption {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px;
+  letter-spacing: .35em;
+  color: rgba(255,255,255,0.7);
+  font-weight: 500;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+.header-right { text-align: right; }
+.subtitle {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.corte-badge {
+  display: inline-block;
+  background: var(--turquesa);
+  color: #FFFFFF;
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  box-shadow: 0 2px 6px rgba(0,171,177,0.3);
+}
+.accent-bar {
+  height: 4px;
+  background: linear-gradient(90deg, var(--turquesa) 0%, var(--verde-energia) 100%);
+}
+.actions-bar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 28px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.actions-bar label { font-size: 11px; color: var(--text-mute); font-weight: 600; margin-right: 4px; }
+.actions-bar input, .actions-bar select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text);
+  background: var(--card);
+  min-width: 140px;
+  font-family: inherit;
+}
+.btn-action {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-action:hover {
+  background: var(--turquesa);
+  color: #fff;
+  border-color: var(--turquesa);
+}
+.fcount { font-size: 12px; color: var(--text-mute); margin-left: auto; font-weight: 400; }
+main { max-width: 1300px; margin: 0 auto; padding: 24px 20px 60px; }
+.info-banner {
+  background: #EFFBFA;
+  border: 1px solid #B8EBE7;
+  color: #006064;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12.5px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+html[data-theme="dark"] .info-banner {
+  background: #092829;
+  border-color: #124e52;
+  color: #8ce3e7;
+}
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.kpi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--turquesa);
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+.kpi .label {
+  font-size: 10.5px;
+  color: var(--text-mute);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.kpi .value {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--heading);
+  margin-top: 4px;
+}
+.kpi .sub { font-size: 11px; color: var(--text-mute); margin-top: 4px; }
+.kpi.c2 { border-top-color: #F59E0B; }
+.kpi.c3 { border-top-color: var(--azul-profundo); }
+.kpi.c4 { border-top-color: var(--verde-energia); }
+.kpi.c5 { border-top-color: var(--turquesa); }
+.kpi.c6 { border-top-color: #8B5CF6; }
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 18px;
+  margin-bottom: 20px;
+}
+@media (max-width: 600px) { .grid2 { grid-template-columns: 1fr; } }
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.03);
+}
+.panel h2 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  color: var(--heading);
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+.panel .panel-sub { font-size: 11px; color: var(--text-mute); margin-bottom: 14px; }
+.chart-wrap { position: relative; height: 240px; }
+.linea-group { margin-bottom: 16px; }
+.linea-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--turquesa);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+}
+.linea-sub { color: var(--text-mute); font-weight: 400; text-transform: none; }
+.modelo-row { margin-bottom: 10px; }
+.modelo-name { font-size: 13px; font-weight: 600; color: var(--heading); margin-bottom: 4px; }
+.modelo-total { font-weight: 400; color: var(--text-mute); font-size: 11.5px; }
+.color-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+}
+.chip-pend { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+table.data { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+table.data th {
+  text-align: left;
+  padding: 10px;
+  background: rgba(0,0,0,0.02);
+  color: var(--text-mute);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+table.data th:hover { color: var(--turquesa); }
+table.data td { padding: 9px 10px; border-bottom: 1px solid var(--border); }
+table.data tr:hover td { background: rgba(0, 171, 177, 0.04); }
+.pill { padding: 3px 9px; border-radius: 9999px; font-size: 10.5px; font-weight: 600; display: inline-block; }
+footer {
+  text-align: center;
+  background: var(--azul-profundo);
+  color: rgba(255,255,255,0.6);
+  padding: 24px;
+  font-size: 11px;
+  margin-top: 30px;
+}
+footer strong { color: var(--turquesa); font-weight: 600; }
+.theme-toggle {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 99;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+@media print {
+  .actions-bar, .theme-toggle { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .panel, .kpi { box-shadow: none !important; border-color: #ddd !important; break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <img
+      src="https://raw.githubusercontent.com/alejomarkets23/biobicis/refs/heads/main/LOGOBIOBICIS.jpeg"
+      alt="BioBicis Colombia"
+      class="brand-logo"
+      onerror="this.style.display='none'"
+    >
+    <div class="brand-sep"></div>
+    <div>
+      <div class="wordmark">Biobicis</div>
+      <div class="brand-caption">Colombia · Movilidad Eléctrica</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="subtitle">Reporte Directivo Oficial de Inventario</div>
+    <div class="corte-badge">Corte: 03/09/2026</div>
+  </div>
+</header>
+<div class="accent-bar"></div>
+
+<div class="actions-bar">
+  <div><label>Modelo</label><input id="fModelo" placeholder="Buscar modelo…"></div>
+  <div><label>Bodega</label><select id="fBodega"><option value="">Todas las bodegas</option></select></div>
+  <div><label>Línea</label><select id="fLinea"><option value="">Todas las líneas</option></select></div>
+  <div><label>Estado</label>
+    <select id="fEstado">
+      <option value="">Todos</option>
+      <option value="Disponible">Disponible (Venta)</option>
+      <option value="Pendiente">Pendiente (Por Armar)</option>
+    </select>
+  </div>
+  <button class="btn-action" id="clearFilters">Limpiar Filtros</button>
+  <button class="btn-action" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+  <span class="fcount" id="filterCount"></span>
+</div>
+
+<main>
+  <div class="info-banner">
+    <span style="font-size: 16px;">ℹ️</span>
+    <div>
+      <strong>Distribución Estratégica por Bodegas:</strong>
+      <span>En <strong>Sede Centenario</strong> el 100% de las unidades se encuentra en cajas/almacenamiento técnico (ensamble pendiente). En <strong>Sede Ricaurte</strong> se concentran las unidades ensambladas listas para entrega retail/mayorista y el taller activo de ensamble.</span>
+    </div>
+  </div>
+
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>Unidades Disponibles por Línea</h2>
+      <div class="panel-sub" id="lineaSub">Vehículos listos para facturación</div>
+      <div class="chart-wrap"><canvas id="chartLinea"></canvas></div>
+    </div>
+    <div class="panel">
+      <h2>Distribución de Stock por Bodega</h2>
+      <div class="panel-sub" id="sedeSub">Inventario consolidado total</div>
+      <div class="chart-wrap"><canvas id="chartSede"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>Sede Ricaurte (Disponibles para Venta)</h2>
+      <div class="panel-sub" id="ricaurteSub"></div>
+      <div id="ricaurteList"></div>
+    </div>
+    <div class="panel">
+      <h2>Sede Centenario (En Caja / Sin Ensamblar)</h2>
+      <div class="panel-sub" id="centenarioSub"></div>
+      <div id="centenarioList"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Bloque de Pendientes por Ensamblar (Taller Ricaurte + Centenario)</h2>
+    <div class="panel-sub">Unidades en fila de alistamiento técnico</div>
+    <div id="pendList"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Detalle Consolidado de Referencias <span class="panel-sub" id="tableCount" style="display:inline;"></span></h2>
+    <div style="overflow-x:auto; max-height:460px; overflow-y:auto;">
+      <table class="data" id="dataTable">
+        <thead>
+          <tr>
+            <th data-k="modelo">Modelo</th>
+            <th data-k="linea">Línea</th>
+            <th data-k="color">Color</th>
+            <th data-k="sede">Bodega</th>
+            <th data-k="estado">Estado</th>
+            <th data-k="stock">Stock (Uds)</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer>
+  Reporte Generado por <strong>Alejandro Morales (Admin)</strong> · Fecha de Emisión: <strong>3/9/2026, 11:13:47 a. m.</strong><br>
+  <strong>BioBicis Colombia</strong> — Tecnología + Movilidad + Respaldo Técnico
+</footer>
+
+<button class="theme-toggle" id="themeToggle" title="Cambiar tema">🌓</button>
+
+<script>
+const RECORDS = [{"sede":"RICAURTE","modelo":"BENGALA 25","linea":"25","color":"AZUL MATE","stock":3,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"JAGUAR 25","linea":"25","color":"AZUL","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"ORIX 25","linea":"25","color":"GRIS","stock":1,"estado":"Disponible","pendiente":false},{"sede":"CENTENARIO","modelo":"RINO 26","linea":"26","color":"NEGRO","stock":18,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"RINO 26","linea":"26","color":"ROJO","stock":33,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"TUCAN 25","linea":"25","color":"AZUL","stock":17,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"TUCAN 25","linea":"25","color":"GRIS","stock":18,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"TUCAN 25","linea":"25","color":"NEGRO","stock":19,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"TUCAN 25","linea":"25","color":"PLATA","stock":15,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"CORAL 25","linea":"25","color":"AMARILLO","stock":7,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"ORIX 25","linea":"25","color":"GRIS","stock":1,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"ORIX 25","linea":"25","color":"ROJO","stock":10,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"ORIX 25","linea":"25","color":"NEGRO","stock":3,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"BENGALA 25","linea":"25","color":"ROJO","stock":36,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"BENGALA 25","linea":"25","color":"NEGRO","stock":43,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"BENGALA 25","linea":"25","color":"AZUL","stock":26,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"BENGALA 25","linea":"25","color":"PLATA","stock":15,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"BENGALA 25","linea":"25","color":"AZUL MATE","stock":28,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"PINGUI 26","linea":"26","color":"AZUL","stock":19,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"PINGUI 26","linea":"26","color":"VERDE","stock":6,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"JAGUAR 25","linea":"25","color":"BLANCO","stock":17,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"JAGUAR 25","linea":"25","color":"NEGRO","stock":15,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"JAGUAR 25","linea":"25","color":"ROJO","stock":12,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"IG KOMODO","linea":"SL","color":"NEGRO","stock":14,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"IG KOMODO","linea":"SL","color":"ROJO","stock":14,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"IG KOMODO","linea":"SL","color":"PLATA","stock":19,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"IG KOMODO","linea":"SL","color":"AZUL","stock":23,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"MANTIS","linea":"SL","color":"AZUL","stock":1,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"JAGUAR 19","linea":"19","color":"AZUL","stock":2,"estado":"Pendiente","pendiente":true},{"sede":"CENTENARIO","modelo":"JAGUAR 19","linea":"19","color":"ROJO","stock":2,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"TUCAN 25","linea":"25","color":"AZUL","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"TUCAN 25","linea":"25","color":"GRIS","stock":0,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"TUCAN 25","linea":"25","color":"NEGRO","stock":0,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"RINO 26","linea":"26","color":"NEGRO","stock":6,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"RINO 26","linea":"26","color":"ROJO","stock":7,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"CORAL 25","linea":"25","color":"AZUL","stock":3,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"CORAL 25","linea":"25","color":"AMARILLO","stock":2,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"CORAL 25","linea":"25","color":"GRIS","stock":3,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"CORAL 25","linea":"25","color":"NEGRO","stock":2,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"BENGALA 25","linea":"25","color":"PLATA","stock":4,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"BENGALA 25","linea":"25","color":"AZUL","stock":24,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"BENGALA 25","linea":"25","color":"NEGRO","stock":6,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"BENGALA 25","linea":"25","color":"ROJO","stock":3,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"PINGUI 26","linea":"26","color":"AZUL","stock":3,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"PINGUI 26","linea":"26","color":"ROJO","stock":3,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"ORIX 25","linea":"25","color":"ROJO","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"JAGUAR 25","linea":"25","color":"BLANCO","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"JAGUAR 25","linea":"25","color":"NEGRO","stock":3,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"JAGUAR 25","linea":"25","color":"ROJO","stock":3,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"IG KOMODO","linea":"SL","color":"NEGRO","stock":3,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"IG KOMODO","linea":"SL","color":"ROJO","stock":7,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"IG KOMODO","linea":"SL","color":"PLATA","stock":6,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"IG KOMODO","linea":"SL","color":"AZUL","stock":6,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"MANTIS 19","linea":"19","color":"ROJO","stock":3,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"MANTIS 19","linea":"19","color":"AZUL","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"HALCON 19","linea":"19","color":"ROJO","stock":3,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"HALCON 19","linea":"19","color":"AMARILLO","stock":2,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"PANTERA 19","linea":"19","color":"NEGRO","stock":3,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"PANDA 19","linea":"19","color":"ROJO","stock":0,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"PANDA 19","linea":"19","color":"AZUL","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"JAGUAR 19","linea":"19","color":"ROJO","stock":2,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"JAGUAR 19","linea":"19","color":"AZUL","stock":2,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"LOBO 25","linea":"25","color":"VERDE","stock":0,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"LINCE 19","linea":"19","color":"AZUL","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"TITI","linea":"SL","color":"GRIS","stock":2,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"PINGUI 19","linea":"19","color":"ROJO","stock":5,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"PINGUI 19","linea":"19","color":"AZUL","stock":2,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"PINGUI 19","linea":"19","color":"NEGRO","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"PINGUI 19","linea":"19","color":"AZUL OSCURO","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"BENGALA 19","linea":"19","color":"NEGRO","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"BENGALA 19","linea":"19","color":"ROJO","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"RANA","linea":"SL","color":"NEGRO","stock":2,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"RANA","linea":"SL","color":"GRIS","stock":2,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"RANA","linea":"SL","color":"AZUL","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"RANA","linea":"SL","color":"AMARILLO","stock":1,"estado":"Disponible","pendiente":false},{"sede":"RICAURTE","modelo":"PINGUI 26","linea":"26","color":"AZUL","stock":4,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"PINGUI 26","linea":"26","color":"NEGRO","stock":3,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"PINGUI 26","linea":"26","color":"ROJO","stock":3,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"PINGUI 26","linea":"26","color":"VERDE","stock":1,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"BENGALA 25","linea":"25","color":"ROJO","stock":1,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"BENGALA 25","linea":"25","color":"NEGRO","stock":2,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"BENGALA 25","linea":"25","color":"AZUL","stock":1,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"CORAL 25","linea":"25","color":"AMARILLO","stock":1,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"ORIX 25","linea":"25","color":"NEGRO","stock":1,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"ORIX 25","linea":"25","color":"ROJO","stock":0,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"IG KOMODO","linea":"SL","color":"ROJO","stock":22,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"IG KOMODO","linea":"SL","color":"NEGRO","stock":18,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"IG KOMODO","linea":"SL","color":"AZUL","stock":2,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"IG KOMODO","linea":"SL","color":"PLATA","stock":2,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"JAGUAR 25","linea":"25","color":"ROJO","stock":0,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"JAGUAR 25","linea":"25","color":"NEGRO","stock":2,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"JAGUAR 25","linea":"25","color":"BLANCO","stock":0,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"TUCAN 25","linea":"25","color":"NEGRO","stock":2,"estado":"Pendiente","pendiente":true},{"sede":"RICAURTE","modelo":"TUCAN 25","linea":"25","color":"GRIS","stock":0,"estado":"Pendiente","pendiente":true}];
+const LINEA_LABELS = {
+  "26": "Línea 2026",
+  "25": "Línea 2025",
+  "19": "Línea 2019",
+  "SL": "Sin línea / Otros"
+};
+const LINEA_ORDER = ["26", "25", "19", "SL"];
+let charts = {};
+let sortState = { key: "stock", dir: -1 };
+
+function semaforo(stock) {
+  if (stock >= 15) return ["#059669", "#D1FAE5"];
+  if (stock >= 5) return ["#D97706", "#FEF3C7"];
+  if (stock >= 1) return ["#DC2626", "#FEE2E2"];
+  return ["#6B7280", "#F3F4F6"];
+}
+
+function destroyChart(k) { if (charts[k]) { charts[k].destroy(); delete charts[k]; } }
+function isDarkMode() { return document.documentElement.getAttribute("data-theme") === "dark"; }
+
+function uniqueVals(arr, f) { return [...new Set(arr.map(r => r[f]).filter(Boolean))].sort(); }
+
+function populateFilters() {
+  const bodegaSel = document.getElementById("fBodega");
+  uniqueVals(RECORDS, "sede").forEach(s => {
+    const o = document.createElement("option");
+    o.value = s;
+    o.textContent = s === "CENTENARIO" ? "Centenario (Almacenamiento)" : "Ricaurte (Ensamble y Ventas)";
+    bodegaSel.appendChild(o);
+  });
+  const lineaSel = document.getElementById("fLinea");
+  LINEA_ORDER.filter(l => RECORDS.some(r => r.linea === l)).forEach(l => {
+    const o = document.createElement("option");
+    o.value = l;
+    o.textContent = LINEA_LABELS[l];
+    lineaSel.appendChild(o);
+  });
+}
+
+["fModelo", "fBodega", "fLinea", "fEstado"].forEach(id => {
+  document.getElementById(id).addEventListener("input", render);
+  document.getElementById(id).addEventListener("change", render);
+});
+
+document.getElementById("clearFilters").addEventListener("click", () => {
+  document.getElementById("fModelo").value = "";
+  document.getElementById("fBodega").value = "";
+  document.getElementById("fLinea").value = "";
+  document.getElementById("fEstado").value = "";
+  render();
+});
+
+document.querySelectorAll("#dataTable th").forEach(th => {
+  th.addEventListener("click", () => {
+    const k = th.dataset.k;
+    if (sortState.key === k) sortState.dir *= -1;
+    else { sortState.key = k; sortState.dir = 1; }
+    render();
+  });
+});
+
+function getFiltered() {
+  const m = document.getElementById("fModelo").value.trim().toUpperCase();
+  const b = document.getElementById("fBodega").value;
+  const l = document.getElementById("fLinea").value;
+  const e = document.getElementById("fEstado").value;
+  return RECORDS.filter(r => {
+    return (!m || r.modelo.toUpperCase().includes(m)) &&
+           (!b || r.sede === b) &&
+           (!l || r.linea === l) &&
+           (!e || r.estado === e);
+  });
+}
+
+function sum(arr, f) { return arr.reduce((s, r) => s + f(r), 0); }
+
+function render() {
+  const F = getFiltered();
+  document.getElementById("filterCount").textContent = F.length + " de " + RECORDS.length + " líneas de stock";
+  const disp = F.filter(r => r.estado === "Disponible" && r.stock > 0);
+  const pend = F.filter(r => r.estado === "Pendiente" && r.stock > 0);
+  renderKPIs(disp, pend);
+  renderCharts(disp, pend);
+  renderBodega("RICAURTE", disp, "ricaurteList", "ricaurteSub");
+  renderCentenario(F.filter(r => r.sede === "CENTENARIO" && r.stock > 0));
+  renderPendientes(pend);
+  renderTable(F);
+}
+
+function renderKPIs(disp, pend) {
+  const totalDisp = sum(disp, r => r.stock);
+  const totalPend = sum(pend, r => r.stock);
+  const totalGeneral = totalDisp + totalPend;
+  const porModelo = {};
+  disp.forEach(r => { porModelo[r.modelo] = (porModelo[r.modelo] || 0) + r.stock; });
+  let topModelo = "-", topStock = 0;
+  Object.keys(porModelo).forEach(m => {
+    if (porModelo[m] > topStock) { topStock = porModelo[m]; topModelo = m; }
+  });
+  const pctDisp = totalGeneral > 0 ? Math.round((totalDisp / totalGeneral) * 100) : 0;
+  const pctPend = totalGeneral > 0 ? Math.round((totalPend / totalGeneral) * 100) : 0;
+
+  const kpis = [
+    { label: "Unidades Disponibles (Venta)", value: totalDisp.toLocaleString("es-CO"), sub: pctDisp + "% del inventario total", cls: "c1" },
+    { label: "Pendientes por Ensamblar", value: totalPend.toLocaleString("es-CO"), sub: pctPend + "% en cajas/taller", cls: "c2" },
+    { label: "Inventario Total Consolidado", value: totalGeneral.toLocaleString("es-CO"), sub: "Disponibles + Pendientes", cls: "c3" },
+    { label: "Líder en Stock Disponible", value: topModelo, sub: topStock + " unidades listas", cls: "c4" },
+    { label: "Referencias Activas", value: uniqueVals(disp, "modelo").length, sub: "Modelos listos para entrega", cls: "c5" }
+  ];
+
+  document.getElementById("kpiRow").innerHTML = kpis.map(k =>
+    '<div class="kpi ' + k.cls + '"><div class="label">' + k.label + '</div><div class="value">' + k.value + '</div><div class="sub">' + k.sub + '</div></div>'
+  ).join("");
+}
+
+function renderCharts(disp, pend) {
+  const porLinea = {};
+  disp.forEach(r => { porLinea[r.linea] = (porLinea[r.linea] || 0) + r.stock; });
+  const lineasPresentes = LINEA_ORDER.filter(l => porLinea[l]);
+  document.getElementById("lineaSub").textContent = sum(disp, r => r.stock) + " unidades disponibles para facturación";
+
+  destroyChart("linea");
+  charts.linea = new Chart(document.getElementById("chartLinea"), {
+    type: "bar",
+    data: {
+      labels: lineasPresentes.map(l => LINEA_LABELS[l]),
+      datasets: [{
+        label: "Unidades",
+        data: lineasPresentes.map(l => porLinea[l]),
+        backgroundColor: "#00ABB1",
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
+
+  const porSede = { CENTENARIO: 0, RICAURTE: 0 };
+  RECORDS.forEach(r => { porSede[r.sede] = (porSede[r.sede] || 0) + r.stock; });
+  destroyChart("sede");
+  charts.sede = new Chart(document.getElementById("chartSede"), {
+    type: "doughnut",
+    data: {
+      labels: ["Centenario (Cajas)", "Ricaurte (Ensamble y Ventas)"],
+      datasets: [{
+        data: [porSede.CENTENARIO, porSede.RICAURTE],
+        backgroundColor: ["#2C2C52", "#00ABB1"]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: "bottom" } }
+    }
+  });
+}
+
+function renderBodega(sede, disp, elId, subId) {
+  const items = disp.filter(r => r.sede === sede);
+  const total = sum(items, r => r.stock);
+  document.getElementById(subId).textContent = total + " unidades disponibles para entrega";
+  const grouped = {};
+  items.forEach(r => {
+    grouped[r.linea] = grouped[r.linea] || {};
+    grouped[r.linea][r.modelo] = grouped[r.linea][r.modelo] || [];
+    grouped[r.linea][r.modelo].push(r);
+  });
+  let html = "";
+  LINEA_ORDER.forEach(linea => {
+    if (!grouped[linea]) return;
+    const modelos = grouped[linea];
+    const allRows = [].concat.apply([], Object.values(modelos));
+    const subtotal = sum(allRows, r => r.stock);
+    html += '<div class="linea-group"><div class="linea-title">' + LINEA_LABELS[linea] + ' <span class="linea-sub">(' + subtotal + ' u.)</span></div>';
+    Object.keys(modelos).sort().forEach(modelo => {
+      const rows = modelos[modelo].slice().sort((a, b) => b.stock - a.stock);
+      const modeloTotal = sum(rows, r => r.stock);
+      html += '<div class="modelo-row"><div class="modelo-name">' + modelo + ' <span class="modelo-total">' + modeloTotal + ' u.</span></div><div class="color-chips">';
+      rows.forEach(r => {
+        const sc = semaforo(r.stock);
+        html += '<span class="chip" style="color:' + sc[0] + ';background:' + sc[1] + ';">' + r.color + ' · ' + r.stock + '</span>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div>';
+  });
+  document.getElementById(elId).innerHTML = html || '<div class="empty-note">Sin resultados de stock disponible.</div>';
+}
+
+function renderCentenario(items) {
+  const total = sum(items, r => r.stock);
+  document.getElementById("centenarioSub").textContent = total + " unidades en caja (100% pendientes de ensamble)";
+  const byModelo = {};
+  items.forEach(r => {
+    byModelo[r.modelo] = byModelo[r.modelo] || [];
+    byModelo[r.modelo].push(r);
+  });
+  let html = "";
+  Object.keys(byModelo).sort().forEach(modelo => {
+    const rows = byModelo[modelo].slice().sort((a, b) => b.stock - a.stock);
+    const mTotal = sum(rows, r => r.stock);
+    html += '<div class="modelo-row"><div class="modelo-name">' + modelo + ' <span class="modelo-total">' + mTotal + ' u. en caja</span></div><div class="color-chips">';
+    rows.forEach(r => {
+      html += '<span class="chip chip-pend">📦 ' + r.color + ' · ' + r.stock + '</span>';
+    });
+    html += '</div></div>';
+  });
+  document.getElementById("centenarioList").innerHTML = html || '<div class="empty-note">Sin unidades en Centenario con este filtro.</div>';
+}
+
+function renderPendientes(pend) {
+  if (pend.length === 0) {
+    document.getElementById("pendList").innerHTML = '<div class="empty-note">No hay unidades pendientes de ensamblar.</div>';
+    return;
+  }
+  const bySede = {};
+  pend.forEach(r => { bySede[r.sede] = bySede[r.sede] || []; bySede[r.sede].push(r); });
+  let html = "";
+  Object.keys(bySede).forEach(sede => {
+    const rows = bySede[sede];
+    const subtotal = sum(rows, r => r.stock);
+    html += '<div class="linea-group"><div class="linea-title">' + (sede === "CENTENARIO" ? "Centenario (Almacén)" : "Ricaurte (Taller Ensamble)") + ' <span class="linea-sub">(' + subtotal + ' u. por armar)</span></div>';
+    const byModelo = {};
+    rows.forEach(r => { byModelo[r.modelo] = byModelo[r.modelo] || []; byModelo[r.modelo].push(r); });
+    Object.keys(byModelo).sort().forEach(modelo => {
+      const mrows = byModelo[modelo].slice().sort((a, b) => b.stock - a.stock);
+      const modeloTotal = sum(mrows, r => r.stock);
+      html += '<div class="modelo-row"><div class="modelo-name">' + modelo + ' <span class="modelo-total">' + modeloTotal + ' u.</span></div><div class="color-chips">';
+      mrows.forEach(r => { html += '<span class="chip chip-pend">' + r.color + ' · ' + r.stock + '</span>'; });
+      html += '</div></div>';
+    });
+    html += '</div>';
+  });
+  document.getElementById("pendList").innerHTML = html;
+}
+
+function renderTable(F) {
+  const rows = F.filter(r => r.stock > 0).slice().sort((a, b) => {
+    const av = a[sortState.key], bv = b[sortState.key];
+    if (typeof av === "number") return (av - bv) * sortState.dir;
+    return String(av).localeCompare(String(bv)) * sortState.dir;
+  });
+  document.getElementById("tableCount").textContent = "(" + rows.length + " registros activos)";
+  document.getElementById("tableBody").innerHTML = rows.map(r => {
+    const sc = semaforo(r.stock);
+    const ec = r.estado === "Disponible" ? ["#059669", "#D1FAE5"] : ["#D97706", "#FEF3C7"];
+    return '<tr><td><strong>' + r.modelo + '</strong></td><td>' + (LINEA_LABELS[r.linea] || r.linea) + '</td><td>' + r.color + '</td>' +
+      '<td>' + (r.sede === 'CENTENARIO' ? 'Centenario' : 'Ricaurte') + '</td>' +
+      '<td><span class="pill" style="color:' + ec[0] + ';background:' + ec[1] + ';">' + r.estado + '</span></td>' +
+      '<td><span class="pill" style="color:' + sc[0] + ';background:' + sc[1] + ';">' + r.stock + ' uds</span></td></tr>';
+  }).join("");
+}
+
+populateFilters();
+render();
+
+document.getElementById("themeToggle").addEventListener("click", () => {
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  document.documentElement.setAttribute("data-theme", isDark ? "light" : "dark");
+});
+</script>
+</body>
+</html>
